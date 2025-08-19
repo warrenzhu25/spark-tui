@@ -4,15 +4,17 @@ use ratatui::widgets::TableState;
 pub enum TabIndex {
     Jobs = 0,
     Stages = 1,
-    Executors = 2,
-    Environment = 3,
+    Tasks = 2,
+    Executors = 3,
+    Environment = 4,
 }
 
 impl TabIndex {
     pub fn next(&self) -> Self {
         match self {
             TabIndex::Jobs => TabIndex::Stages,
-            TabIndex::Stages => TabIndex::Executors,
+            TabIndex::Stages => TabIndex::Tasks,
+            TabIndex::Tasks => TabIndex::Executors,
             TabIndex::Executors => TabIndex::Environment,
             TabIndex::Environment => TabIndex::Jobs,
         }
@@ -22,7 +24,8 @@ impl TabIndex {
         match self {
             TabIndex::Jobs => TabIndex::Environment,
             TabIndex::Stages => TabIndex::Jobs,
-            TabIndex::Executors => TabIndex::Stages,
+            TabIndex::Tasks => TabIndex::Stages,
+            TabIndex::Executors => TabIndex::Tasks,
             TabIndex::Environment => TabIndex::Executors,
         }
     }
@@ -32,6 +35,7 @@ pub struct AppState {
     pub selected_tab: TabIndex,
     pub jobs_table_state: TableState,
     pub stages_table_state: TableState,
+    pub tasks_table_state: TableState,
     pub executors_table_state: TableState,
 }
 
@@ -43,6 +47,9 @@ impl AppState {
         let mut stages_table_state = TableState::default();
         stages_table_state.select(Some(0));
 
+        let mut tasks_table_state = TableState::default();
+        tasks_table_state.select(Some(0));
+
         let mut executors_table_state = TableState::default();
         executors_table_state.select(Some(0));
 
@@ -50,6 +57,7 @@ impl AppState {
             selected_tab: TabIndex::Jobs,
             jobs_table_state,
             stages_table_state,
+            tasks_table_state,
             executors_table_state,
         }
     }

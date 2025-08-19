@@ -84,9 +84,12 @@ impl App {
                 self.state.selected_tab = TabIndex::Stages;
             }
             KeyCode::Char('3') => {
-                self.state.selected_tab = TabIndex::Executors;
+                self.state.selected_tab = TabIndex::Tasks;
             }
             KeyCode::Char('4') => {
+                self.state.selected_tab = TabIndex::Executors;
+            }
+            KeyCode::Char('5') => {
                 self.state.selected_tab = TabIndex::Environment;
             }
             KeyCode::Tab => {
@@ -107,6 +110,12 @@ impl App {
                         if self.state.stages_table_state.selected().unwrap_or(0) > 0 {
                             let selected = self.state.stages_table_state.selected().unwrap_or(0);
                             self.state.stages_table_state.select(Some(selected - 1));
+                        }
+                    }
+                    TabIndex::Tasks => {
+                        if self.state.tasks_table_state.selected().unwrap_or(0) > 0 {
+                            let selected = self.state.tasks_table_state.selected().unwrap_or(0);
+                            self.state.tasks_table_state.select(Some(selected - 1));
                         }
                     }
                     TabIndex::Executors => {
@@ -135,6 +144,15 @@ impl App {
                             let selected = self.state.stages_table_state.selected().unwrap_or(0);
                             if selected < stages_count - 1 {
                                 self.state.stages_table_state.select(Some(selected + 1));
+                            }
+                        }
+                    }
+                    TabIndex::Tasks => {
+                        let tasks_count = self.event_log.tasks.len();
+                        if tasks_count > 0 {
+                            let selected = self.state.tasks_table_state.selected().unwrap_or(0);
+                            if selected < tasks_count - 1 {
+                                self.state.tasks_table_state.select(Some(selected + 1));
                             }
                         }
                     }
