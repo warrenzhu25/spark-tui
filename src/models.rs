@@ -10,6 +10,7 @@ pub struct SparkEventLog {
     pub tasks: HashMap<u64, Task>,
     pub executors: HashMap<String, Executor>,
     pub environment: Environment,
+    pub sql_executions: HashMap<u64, SqlExecution>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -178,4 +179,32 @@ pub struct Environment {
     pub hadoop_properties: HashMap<String, String>,
     pub system_properties: HashMap<String, String>,
     pub classpath_entries: HashMap<String, String>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct SqlExecution {
+    pub execution_id: u64,
+    pub description: String,
+    pub details: String,
+    pub physical_plan_description: String,
+    pub submission_time: DateTime<Utc>,
+    pub completion_time: Option<DateTime<Utc>>,
+    pub status: SqlExecutionStatus,
+    pub jobs: Vec<u64>,
+    pub stages: Vec<u64>,
+    pub metrics: Vec<SqlMetric>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub enum SqlExecutionStatus {
+    Running,
+    Completed,
+    Failed,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct SqlMetric {
+    pub name: String,
+    pub value: u64,
+    pub metric_type: String,
 }

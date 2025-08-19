@@ -54,6 +54,9 @@ impl UI {
             TabIndex::Executors => {
                 ExecutorsTab::draw(f, chunks[2], event_log, &state.executors_table_state);
             }
+            TabIndex::Sql => {
+                SqlTab::draw(f, chunks[2], event_log, &state.sql_table_state);
+            }
             TabIndex::Environment => {
                 EnvironmentTab::draw(f, chunks[2], event_log);
             }
@@ -88,7 +91,7 @@ impl UI {
     }
 
     fn draw_tab_bar(&self, f: &mut Frame, area: ratatui::layout::Rect, state: &AppState) {
-        let tab_titles = vec!["Jobs (1)", "Stages (2)", "Tasks (3)", "Executors (4)", "Environment (5)"];
+        let tab_titles = vec!["Jobs (1)", "Stages (2)", "Tasks (3)", "Executors (4)", "SQL (5)", "Environment (6)"];
         let tabs = Tabs::new(tab_titles)
             .block(Block::default().borders(Borders::ALL))
             .style(Style::default().fg(Color::White))
@@ -104,7 +107,7 @@ impl UI {
     }
 
     fn draw_footer(&self, f: &mut Frame, area: ratatui::layout::Rect) {
-        let help_text = "Navigation: Tab/Shift+Tab (Switch tabs) | 1-5 (Direct tab) | ↑↓/jk (Navigate) | q/Esc (Quit)";
+        let help_text = "Navigation: Tab/Shift+Tab (Switch tabs) | 1-6 (Direct tab) | ↑↓/jk (Navigate) | q/Esc (Quit)";
         let paragraph = Paragraph::new(help_text)
             .style(Style::default().fg(Color::Gray))
             .block(Block::default().borders(Borders::ALL).title("Help"));

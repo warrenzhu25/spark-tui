@@ -38,6 +38,7 @@ fn main() -> Result<()> {
         println!("Stages: {}", event_log.stages.len());
         println!("Tasks: {}", event_log.tasks.len());
         println!("Executors: {}", event_log.executors.len());
+        println!("SQL Executions: {}", event_log.sql_executions.len());
         println!("Spark Properties: {}", event_log.environment.spark_properties.len());
         return Ok(());
     }

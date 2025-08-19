@@ -6,7 +6,8 @@ pub enum TabIndex {
     Stages = 1,
     Tasks = 2,
     Executors = 3,
-    Environment = 4,
+    Sql = 4,
+    Environment = 5,
 }
 
 impl TabIndex {
@@ -15,7 +16,8 @@ impl TabIndex {
             TabIndex::Jobs => TabIndex::Stages,
             TabIndex::Stages => TabIndex::Tasks,
             TabIndex::Tasks => TabIndex::Executors,
-            TabIndex::Executors => TabIndex::Environment,
+            TabIndex::Executors => TabIndex::Sql,
+            TabIndex::Sql => TabIndex::Environment,
             TabIndex::Environment => TabIndex::Jobs,
         }
     }
@@ -26,7 +28,8 @@ impl TabIndex {
             TabIndex::Stages => TabIndex::Jobs,
             TabIndex::Tasks => TabIndex::Stages,
             TabIndex::Executors => TabIndex::Tasks,
-            TabIndex::Environment => TabIndex::Executors,
+            TabIndex::Sql => TabIndex::Executors,
+            TabIndex::Environment => TabIndex::Sql,
         }
     }
 }
@@ -37,6 +40,7 @@ pub struct AppState {
     pub stages_table_state: TableState,
     pub tasks_table_state: TableState,
     pub executors_table_state: TableState,
+    pub sql_table_state: TableState,
 }
 
 impl AppState {
@@ -53,12 +57,16 @@ impl AppState {
         let mut executors_table_state = TableState::default();
         executors_table_state.select(Some(0));
 
+        let mut sql_table_state = TableState::default();
+        sql_table_state.select(Some(0));
+
         Self {
             selected_tab: TabIndex::Jobs,
             jobs_table_state,
             stages_table_state,
             tasks_table_state,
             executors_table_state,
+            sql_table_state,
         }
     }
 

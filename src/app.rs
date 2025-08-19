@@ -90,6 +90,9 @@ impl App {
                 self.state.selected_tab = TabIndex::Executors;
             }
             KeyCode::Char('5') => {
+                self.state.selected_tab = TabIndex::Sql;
+            }
+            KeyCode::Char('6') => {
                 self.state.selected_tab = TabIndex::Environment;
             }
             KeyCode::Tab => {
@@ -122,6 +125,12 @@ impl App {
                         if self.state.executors_table_state.selected().unwrap_or(0) > 0 {
                             let selected = self.state.executors_table_state.selected().unwrap_or(0);
                             self.state.executors_table_state.select(Some(selected - 1));
+                        }
+                    }
+                    TabIndex::Sql => {
+                        if self.state.sql_table_state.selected().unwrap_or(0) > 0 {
+                            let selected = self.state.sql_table_state.selected().unwrap_or(0);
+                            self.state.sql_table_state.select(Some(selected - 1));
                         }
                     }
                     _ => {}
@@ -162,6 +171,15 @@ impl App {
                             let selected = self.state.executors_table_state.selected().unwrap_or(0);
                             if selected < executors_count - 1 {
                                 self.state.executors_table_state.select(Some(selected + 1));
+                            }
+                        }
+                    }
+                    TabIndex::Sql => {
+                        let sql_count = self.event_log.sql_executions.len();
+                        if sql_count > 0 {
+                            let selected = self.state.sql_table_state.selected().unwrap_or(0);
+                            if selected < sql_count - 1 {
+                                self.state.sql_table_state.select(Some(selected + 1));
                             }
                         }
                     }

@@ -25,6 +25,7 @@ pub fn parse_event_log(log_path: &Path) -> Result<SparkEventLog> {
         system_properties: HashMap::new(),
         classpath_entries: HashMap::new(),
     };
+    let mut sql_executions = HashMap::new();
     
     for line in reader.lines() {
         let line = line.context("Failed to read line from event log")?;
@@ -100,6 +101,18 @@ pub fn parse_event_log(log_path: &Path) -> Result<SparkEventLog> {
                 "SparkListenerEnvironmentUpdate" => {
                     environment = parse_environment_update(&event)?;
                 }
+                "SparkListenerSQLExecutionStart" => {
+                    let sql_execution = parse_sql_execution_start(&event)?;
+                    sql_executions.insert(sql_execution.execution_id, sql_execution);
+                }
+                "SparkListenerSQLExecutionEnd" => {
+                    if let Some(execution_id) = event.get("executionId").and_then(|v| v.as_u64()) {
+                        if let Some(sql_execution) = sql_executions.get_mut(&execution_id) {
+                            sql_execution.completion_time = parse_timestamp(&event, "time");
+                            sql_execution.status = crate::models::SqlExecutionStatus::Completed;
+                        }
+                    }
+                }
                 _ => {
                     // Ignore other event types for now
                 }
@@ -117,6 +130,7 @@ pub fn parse_event_log(log_path: &Path) -> Result<SparkEventLog> {
         tasks,
         executors,
         environment,
+        sql_executions,
     })
 }
 
@@ -453,4 +467,41 @@ fn parse_task_status(task_info: &Value) -> TaskStatus {
     } else {
         TaskStatus::Running
     }
+}
+
+fn parse_sql_execution_start(event: &Value) -> Result<crate::models::SqlExecution> {
+    let execution_id = event.get("executionId")
+        .and_then(|v| v.as_u64())
+        .context("Missing execution ID")?;
+    
+    let description = event.get("description")
+        .and_then(|v| v.as_str())
+        .unwrap_or("SQL Execution")
+        .to_string();
+    
+    let details = event.get("details")
+        .and_then(|v| v.as_str())
+        .unwrap_or("")
+        .to_string();
+    
+    let physical_plan = event.get("physicalPlanDescription")
+        .and_then(|v| v.as_str())
+        .unwrap_or("")
+        .to_string();
+    
+    let submission_time = parse_timestamp(event, "time")
+        .unwrap_or_else(|| Utc::now());
+    
+    Ok(crate::models::SqlExecution {
+        execution_id,
+        description,
+        details,
+        physical_plan_description: physical_plan,
+        submission_time,
+        completion_time: None,
+        status: crate::models::SqlExecutionStatus::Running,
+        jobs: Vec::new(),
+        stages: Vec::new(),
+        metrics: Vec::new(),
+    })
 }
